@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TFarm System V12</title>
+    <title>TFarm System V13 (Stable)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -12,21 +12,34 @@
         .mono-font { font-family: 'JetBrains Mono', monospace; }
         .card-shadow { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
         
-        /* Print Logic */
+        /* --- OPTIMIZED PRINT LOGIC --- */
         @media print {
-            body * { visibility: hidden; }
-            .print-area, .print-area * { visibility: visible; }
-            .print-area { position: absolute; left: 0; top: 0; width: 100%; margin: 0; padding: 0; }
-            .no-print { display: none !important; }
+            /* Sembunyikan aplikasi utama saat print */
+            #main-app { display: none !important; }
+            
+            /* Tampilkan hanya area print yang sedang aktif */
+            #print-container { 
+                display: block !important; 
+                position: absolute; 
+                top: 0; 
+                left: 0; 
+                width: 100%; 
+            }
+            
+            /* Reset styling untuk print */
+            body { background: white; margin: 0; padding: 0; }
             * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
         }
+
+        /* Container Print tersembunyi di layar biasa */
+        #print-container { display: none; }
 
         .active-tab { border-bottom: 3px solid #f59e0b; color: #1e293b; font-weight: bold; }
         .inactive-tab { color: #64748b; }
         
-        /* Custom Gradients & Transitions */
+        /* Gradients */
         .bg-gradient-dash { background: linear-gradient(135deg, #1e293b 0%, #334155 100%); }
-        #slipHeaderBox { transition: background-color 0.5s ease, background-image 0.5s ease; }
+        #slipHeaderBox { transition: background-color 0.5s ease; }
 
         .watermark {
             position: absolute;
@@ -41,10 +54,11 @@
 </head>
 <body class="p-4 md:p-6 text-slate-800">
 
-    <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <!-- WRAPPER UTAMA (Disembunyikan saat Print) -->
+    <div id="main-app" class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6">
         
         <!-- HEADER SYSTEM -->
-        <div class="lg:col-span-12 mb-2 flex items-center justify-between no-print">
+        <div class="lg:col-span-12 mb-2 flex items-center justify-between">
             <div class="flex items-center">
                 <div class="w-10 h-10 bg-slate-900 rounded-lg flex items-center justify-center mr-3 shadow-lg text-white">
                     <i class="fas fa-layer-group"></i>
@@ -57,7 +71,7 @@
         </div>
 
         <!-- KOLOM KIRI: INPUT DATA -->
-        <div class="lg:col-span-4 space-y-5 no-print">
+        <div class="lg:col-span-4 space-y-5">
             <div class="bg-white rounded-2xl p-5 card-shadow border border-slate-200">
                 <div class="flex items-center justify-between mb-4">
                     <h2 class="text-md font-bold text-slate-700 flex items-center">
@@ -123,20 +137,21 @@
         <div class="lg:col-span-8">
             
             <!-- TABS NAVIGATION -->
-            <div class="flex space-x-6 border-b border-slate-200 mb-6 no-print">
-                <button onclick="switchTab('slip')" id="btnTabSlip" class="pb-2 text-sm active-tab transition-all">
+            <div class="flex space-x-6 border-b border-slate-200 mb-6">
+                <button onclick="switchTab('slip')" id="btnTabSlip" class="pb-2 text-sm active-tab transition-all outline-none">
                     <i class="fas fa-file-invoice-dollar mr-1"></i> Slip Gaji (Pegawai)
                 </button>
-                <button onclick="switchTab('dashboard')" id="btnTabDash" class="pb-2 text-sm inactive-tab transition-all">
+                <button onclick="switchTab('dashboard')" id="btnTabDash" class="pb-2 text-sm inactive-tab transition-all outline-none">
                     <i class="fas fa-chart-line mr-1"></i> Dashboard Produksi
                 </button>
             </div>
 
-            <!-- VIEW 1: SLIP GAJI (COLORFUL HEADER) -->
+            <!-- VIEW 1: SLIP GAJI -->
             <div id="viewSlip" class="transition-opacity duration-300">
-                <div id="printAreaSlip" class="bg-white rounded-2xl shadow-xl max-w-2xl mx-auto overflow-hidden border border-slate-200 relative">
+                <!-- ID "contentToPrintSlip" adalah target clone untuk print -->
+                <div id="contentToPrintSlip" class="bg-white rounded-2xl shadow-xl max-w-2xl mx-auto overflow-hidden border border-slate-200 relative">
                     
-                    <!-- HEADER SLIP (DYNAMIC COLOR) -->
+                    <!-- HEADER SLIP -->
                     <div id="slipHeaderBox" class="bg-slate-800 p-8 text-white relative overflow-hidden transition-colors duration-500">
                         <div class="absolute top-0 right-0 w-40 h-full bg-white/10 transform skew-x-12 translate-x-10"></div>
                         <div class="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full filter blur-xl"></div>
@@ -218,7 +233,7 @@
                             <span id="slipTotal" class="text-3xl font-mono font-bold tracking-tight">Rp 0</span>
                         </div>
 
-                        <!-- Catatan Evaluasi (New in Slip) -->
+                        <!-- Catatan Evaluasi -->
                         <div class="mb-6 bg-slate-50 p-4 rounded-xl border border-dashed border-slate-300">
                             <h4 class="text-xs font-bold text-slate-500 uppercase mb-2">Catatan & Evaluasi Kinerja</h4>
                             <div id="slipConclusion" class="text-xs text-slate-600 italic leading-relaxed">
@@ -244,16 +259,17 @@
                     </div>
                 </div>
                 
-                <div class="mt-6 text-center no-print">
-                    <button onclick="printSection('printAreaSlip')" class="bg-slate-800 hover:bg-slate-700 text-white px-8 py-3 rounded-xl font-bold shadow-lg transition flex items-center justify-center mx-auto">
+                <div class="mt-6 text-center">
+                    <button onclick="printContent('contentToPrintSlip')" class="bg-slate-800 hover:bg-slate-700 text-white px-8 py-3 rounded-xl font-bold shadow-lg transition flex items-center justify-center mx-auto">
                         <i class="fas fa-print mr-2"></i> Cetak Slip Resmi
                     </button>
                 </div>
             </div>
 
-            <!-- VIEW 2: DASHBOARD ADMIN (Versi Laporan Teknis) -->
+            <!-- VIEW 2: DASHBOARD ADMIN -->
             <div id="viewDash" class="hidden transition-opacity duration-300">
-                <div id="printAreaDash" class="bg-white rounded-xl shadow-xl overflow-hidden border border-slate-200">
+                <!-- ID "contentToPrintDash" adalah target clone untuk print -->
+                <div id="contentToPrintDash" class="bg-white rounded-xl shadow-xl overflow-hidden border border-slate-200">
                     
                     <!-- Dash Header -->
                     <div class="bg-gradient-dash p-6 text-white">
@@ -270,7 +286,6 @@
                             </div>
                         </div>
                         
-                        <!-- Mini Info (Tanpa Nama Pegawai) -->
                         <div class="grid grid-cols-3 gap-4 mt-6 text-xs border-t border-white/10 pt-4">
                             <div>
                                 <span class="text-slate-400 block uppercase font-bold text-[10px]">Jenis DOC</span>
@@ -319,7 +334,7 @@
                             </div>
                         </div>
 
-                        <!-- Summary Table (Tanpa Gaji) -->
+                        <!-- Summary Table -->
                         <table class="w-full text-sm border-collapse mb-6">
                             <thead>
                                 <tr class="bg-slate-50 text-slate-500 text-xs uppercase">
@@ -360,8 +375,8 @@
                     </div>
                 </div>
 
-                <div class="mt-6 text-center no-print">
-                    <button onclick="printSection('printAreaDash')" class="bg-blue-600 hover:bg-blue-500 text-white px-8 py-3 rounded-xl font-bold shadow-lg transition mx-auto">
+                <div class="mt-6 text-center">
+                    <button onclick="printContent('contentToPrintDash')" class="bg-blue-600 hover:bg-blue-500 text-white px-8 py-3 rounded-xl font-bold shadow-lg transition mx-auto">
                         <i class="fas fa-print mr-2"></i> Cetak Laporan Produksi
                     </button>
                 </div>
@@ -370,6 +385,9 @@
         </div>
 
     </div>
+
+    <!-- WADAH KHUSUS PRINT -->
+    <div id="print-container"></div>
 
     <script>
         const formatRupiah = (num) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(num);
@@ -390,21 +408,35 @@
             if (tab === 'slip') {
                 viewSlip.classList.remove('hidden');
                 viewDash.classList.add('hidden');
-                btnSlip.className = "pb-2 text-sm active-tab transition-all";
-                btnDash.className = "pb-2 text-sm inactive-tab transition-all";
+                btnSlip.className = "pb-2 text-sm active-tab transition-all outline-none";
+                btnDash.className = "pb-2 text-sm inactive-tab transition-all outline-none";
             } else {
                 viewSlip.classList.add('hidden');
                 viewDash.classList.remove('hidden');
-                btnSlip.className = "pb-2 text-sm inactive-tab transition-all";
-                btnDash.className = "pb-2 text-sm active-tab transition-all";
+                btnSlip.className = "pb-2 text-sm inactive-tab transition-all outline-none";
+                btnDash.className = "pb-2 text-sm active-tab transition-all outline-none";
             }
         }
 
-        function printSection(divId) {
-            const printContents = document.getElementById(divId).innerHTML;
-            document.body.innerHTML = `<div class="print-area">${printContents}</div>`;
+        // --- OPTIMIZED PRINT FUNCTION (NO RESET) ---
+        function printContent(elementId) {
+            const content = document.getElementById(elementId);
+            const printContainer = document.getElementById('print-container');
+            
+            // 1. Bersihkan kontainer print
+            printContainer.innerHTML = '';
+            
+            // 2. Clone elemen yang mau di-print (deep clone)
+            const clonedContent = content.cloneNode(true);
+            
+            // 3. Masukkan ke kontainer print
+            printContainer.appendChild(clonedContent);
+            
+            // 4. Panggil print browser (CSS @media print akan menangani sisanya)
             window.print();
-            location.reload(); 
+            
+            // 5. Bersihkan lagi setelah print (Opsional, browser modern menangani ini)
+            // printContainer.innerHTML = ''; 
         }
 
         function updateUI() {
@@ -481,7 +513,6 @@
             // --- Generate Conclusion Logic (EXTENDED) ---
             let conclusions = [];
             
-            // Analisa IP
             if (ip >= 330) {
                 conclusions.push("✅ <span class='font-bold text-green-600'>Hasil Panen Sangat Memuaskan.</span> Manajemen sudah sangat baik, pertahankan kualitas kontrol suhu dan ventilasi untuk periode berikutnya.");
             } else if (ip >= 300) {
@@ -490,20 +521,17 @@
                 conclusions.push("❌ <span class='font-bold text-red-600'>Hasil Panen Kurang Maksimal.</span> Terjadi kebocoran efisiensi yang parah. Wajib evaluasi total manajemen kandang.");
             }
 
-            // Analisa FCR (Expanded)
             if (fcr > 1.6) {
                 conclusions.push("⚠️ <span class='font-bold text-red-600'>FCR Membengkak ("+fcr.toFixed(3)+").</span> Terindikasi banyak <b>pakan tumpah</b> saat pemberian atau tempat pakan terlalu penuh. Segera perbaiki teknis pemberian pakan agar tidak terbuang.");
             } else if (fcr < 1.4 && fcr > 0) {
                 conclusions.push("✅ <span class='font-bold text-blue-600'>Efisiensi Pakan Luar Biasa ("+fcr.toFixed(3)+").</span> Pakan terkonversi daging dengan sangat baik.");
             }
 
-            // Analisa Deplesi (Expanded)
             if (deplesi > 5) {
                 conclusions.push("⚠️ <span class='font-bold text-red-600'>Angka Kematian Tinggi ("+deplesi.toFixed(1)+"%).</span> Perhatian khusus pada masa <b>Brooding</b> (minggu awal). Cek suhu pemanas dan kepadatan kandang, karena kematian tinggi biasanya berakar dari manajemen awal yang kurang teliti.");
             }
 
             let finalConclusion = conclusions.length > 0 ? conclusions.join("<br><br>") : "Data belum cukup untuk memberikan kesimpulan.";
-
 
             // --- POPULATE SLIP ---
             document.getElementById('slipPopulasi').innerText = formatNum(hidup);
@@ -522,7 +550,6 @@
             document.getElementById('slipFcr').innerText = fcr.toFixed(3);
             document.getElementById('slipDeplesi').innerText = deplesi.toFixed(2) + "%";
             
-            // Sync Notes to Slip
             document.getElementById('slipConclusion').innerHTML = finalConclusion;
 
             // --- POPULATE DASHBOARD ---
@@ -539,14 +566,20 @@
             document.getElementById('dashDeplesi').innerText = deplesi.toFixed(2) + "%";
             document.getElementById('dashAbw').innerText = abw.toFixed(2);
             
-            // Conclusion Box
             document.getElementById('dashConclusion').innerHTML = finalConclusion;
 
-            // Table Data
             document.getElementById('tblPopAwal').innerText = formatNum(populasi);
             document.getElementById('tblPopAkhir').innerText = formatNum(hidup);
             document.getElementById('tblPakan').innerText = formatNum(pakanSak) + " Sak";
             document.getElementById('tblTonase').innerText = formatNum(totalKg) + " Kg";
+        }
+
+        function resetForm() {
+            document.querySelectorAll('input').forEach(i => i.value = '');
+            // Reset visuals...
+            document.getElementById('slipTotal').innerText = "Rp 0";
+            document.getElementById('dashIp').innerText = "0";
+            updateUI();
         }
     </script>
 </body>
