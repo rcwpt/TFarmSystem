@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TFarm System</title>
+    <title>TFarm System V19</title>
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/rcwpt/tfarm/main/logo.png">
     
@@ -15,7 +15,6 @@
         .mono-font { font-family: 'JetBrains Mono', monospace; }
         .card-shadow { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
         
-        /* --- OPTIMIZED PRINT LOGIC (NON-DESTRUCTIVE) --- */
         @media print {
             #main-app { display: none !important; }
             #print-container { 
@@ -48,7 +47,6 @@
             width: 300px;
         }
         
-        /* Logo adjustment */
         .tfarm-logo { object-fit: contain; background: white; border-radius: 8px; padding: 2px; }
     </style>
 </head>
@@ -63,7 +61,7 @@
                 <img src="https://raw.githubusercontent.com/rcwpt/tfarm/main/logo.png" alt="TFarm Logo" class="w-12 h-12 mr-3 shadow-sm tfarm-logo">
                 <div>
                     <h1 class="text-xl font-extrabold text-slate-900 tracking-tight">TFarm <span class="text-amber-500">System</span></h1>
-                    <p class="text-slate-500 text-xs font-medium">Manajemen Produksi</p>
+                    <p class="text-slate-500 text-xs font-medium">Manajemen Produksi & Gaji</p>
                 </div>
             </div>
         </div>
@@ -128,10 +126,13 @@
                         <input type="number" step="0.01" id="totalPanen" class="w-full px-3 py-2 border border-slate-300 rounded text-sm font-bold text-green-600" placeholder="0.00" oninput="calculateAll()">
                     </div>
 
-                    <!-- Info Rate (Visual Help) -->
-                    <div class="bg-blue-50 p-2 rounded border border-blue-100 mt-2">
-                        <p class="text-[10px] text-blue-600 font-bold text-center">
-                            Rate Basis: Rp 900/ekor | Target Bonus: Rp 500/kg
+                    <!-- Info Rate -->
+                    <div class="bg-blue-50 p-2 rounded border border-blue-100 mt-2 text-center">
+                        <p class="text-[10px] text-blue-600 font-bold mb-1">
+                            Standar FCR: 1.60 - 1.75
+                        </p>
+                        <p class="text-[9px] text-slate-500">
+                            Selisih tiap 0.01 poin = Rp 4 /kg
                         </p>
                     </div>
                 </div>
@@ -153,7 +154,6 @@
 
             <!-- VIEW 1: SLIP GAJI -->
             <div id="viewSlip" class="transition-opacity duration-300">
-                <!-- Content to Clone for Print -->
                 <div id="contentToPrintSlip" class="bg-white rounded-2xl shadow-xl max-w-2xl mx-auto overflow-hidden border border-slate-200 relative">
                     
                     <!-- HEADER SLIP -->
@@ -186,14 +186,28 @@
                         </svg>
 
                         <!-- Employee Info -->
-                        <div class="flex justify-between items-end border-b border-slate-100 pb-6 mb-6">
-                            <div>
-                                <p class="text-[10px] text-slate-400 uppercase font-bold mb-1">Penerima (Operator)</p>
-                                <h2 id="slipNama" class="text-2xl font-bold text-slate-800 uppercase">-</h2>
+                        <div class="border-b border-slate-100 pb-6 mb-6">
+                            <div class="flex justify-between items-end mb-4">
+                                <div>
+                                    <p class="text-[10px] text-slate-400 uppercase font-bold mb-1">Penerima (Operator)</p>
+                                    <h2 id="slipNama" class="text-2xl font-bold text-slate-800 uppercase">-</h2>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-[10px] text-slate-400 uppercase font-bold mb-1">Tanggal Cetak</p>
+                                    <p id="slipDate" class="text-sm font-bold text-slate-600">-</p>
+                                </div>
                             </div>
-                            <div class="text-right">
-                                <p class="text-[10px] text-slate-400 uppercase font-bold mb-1">Tanggal Cetak</p>
-                                <p id="slipDate" class="text-sm font-bold text-slate-600">-</p>
+                            
+                            <!-- INFO DOC & PAKAN (New in Slip) -->
+                            <div class="grid grid-cols-2 gap-4 bg-slate-50 p-3 rounded-lg border border-slate-100">
+                                <div>
+                                    <p class="text-[10px] text-slate-400 uppercase font-bold">Jenis DOC</p>
+                                    <p id="slipDoc" class="font-bold text-slate-700 text-sm uppercase">-</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-[10px] text-slate-400 uppercase font-bold">Jenis Pakan</p>
+                                    <p id="slipPakan" class="font-bold text-slate-700 text-sm uppercase">-</p>
+                                </div>
                             </div>
                         </div>
 
@@ -207,7 +221,7 @@
                             <div class="grid grid-cols-12 items-center bg-slate-50 p-3 rounded-lg border border-slate-100">
                                 <div class="col-span-8">
                                     <p class="font-bold text-slate-700 text-sm">1. Upah Basis Produksi</p>
-                                    <p class="text-[10px] text-slate-500 mt-0.5">Populasi Hidup: <span id="slipPopulasi">0</span> ekor x Rp 900</p>
+                                    <p class="text-[10px] text-slate-500 mt-0.5">Populasi Hidup: <span id="slipPopulasi">0</span> ekor x Rp 1.000</p>
                                 </div>
                                 <div class="col-span-4 text-right">
                                     <p id="slipNominalBasis" class="font-bold text-slate-700">Rp 0</p>
@@ -216,9 +230,9 @@
 
                             <div class="grid grid-cols-12 items-center bg-slate-50 p-3 rounded-lg border border-slate-100">
                                 <div class="col-span-8">
-                                    <p class="font-bold text-slate-700 text-sm">2. Insentif Tonase (Bonus)</p>
-                                    <p class="text-[10px] text-slate-500 mt-0.5">
-                                        Tonase: <span id="slipVol">0</span> kg x Rate <span id="slipRate" class="font-bold text-emerald-600">Rp 0</span>
+                                    <p class="font-bold text-slate-700 text-sm">2. Insentif Tonase</p>
+                                    <p class="text-[10px] text-slate-500 mt-0.5" id="slipBonusDetail">
+                                        Tonase: 0 kg x Rate Rp 0
                                     </p>
                                 </div>
                                 <div class="col-span-4 text-right">
@@ -244,19 +258,22 @@
                             </div>
                         </div>
 
-                        <!-- Performance Footer -->
-                        <div class="grid grid-cols-3 gap-4 text-center border-t border-slate-100 pt-6">
-                            <div>
-                                <p class="text-[10px] text-slate-400 uppercase font-bold">IP Score</p>
-                                <p id="slipIp" class="text-lg font-bold text-slate-700">0</p>
+                        <!-- Performance Footer Cards (Colorful) -->
+                        <div class="grid grid-cols-3 gap-3 border-t border-slate-100 pt-6">
+                            <!-- IP CARD -->
+                            <div id="slipCardIp" class="bg-slate-100 p-3 rounded-lg text-center border-l-4 border-slate-400 transition-colors">
+                                <p class="text-[10px] uppercase font-bold opacity-60">IP Score</p>
+                                <p id="slipIp" class="text-xl font-black text-slate-800">0</p>
                             </div>
-                            <div class="border-l border-r border-slate-100">
-                                <p class="text-[10px] text-slate-400 uppercase font-bold">FCR</p>
-                                <p id="slipFcr" class="text-lg font-bold text-slate-700">0.00</p>
+                            <!-- FCR CARD -->
+                            <div id="slipCardFcr" class="bg-slate-100 p-3 rounded-lg text-center border-l-4 border-slate-400 transition-colors">
+                                <p class="text-[10px] uppercase font-bold opacity-60">FCR</p>
+                                <p id="slipFcr" class="text-xl font-black text-slate-800">0.00</p>
                             </div>
-                            <div>
-                                <p class="text-[10px] text-slate-400 uppercase font-bold">Deplesi</p>
-                                <p id="slipDeplesi" class="text-lg font-bold text-red-500">0%</p>
+                            <!-- DEPLESI CARD -->
+                            <div id="slipCardDeplesi" class="bg-slate-100 p-3 rounded-lg text-center border-l-4 border-slate-400 transition-colors">
+                                <p class="text-[10px] uppercase font-bold opacity-60">Deplesi</p>
+                                <p id="slipDeplesi" class="text-xl font-black text-slate-800">0%</p>
                             </div>
                         </div>
                     </div>
@@ -271,9 +288,7 @@
 
             <!-- VIEW 2: DASHBOARD ADMIN -->
             <div id="viewDash" class="hidden transition-opacity duration-300">
-                <!-- Content to Clone for Print -->
                 <div id="contentToPrintDash" class="bg-white rounded-xl shadow-xl overflow-hidden border border-slate-200">
-                    
                     <!-- Dash Header -->
                     <div class="bg-gradient-dash p-6 text-white">
                         <div class="flex justify-between items-center">
@@ -323,7 +338,7 @@
                             <div class="bg-blue-50 p-4 rounded-xl border border-blue-100 text-center">
                                 <p class="text-xs font-bold text-blue-400 uppercase">FCR</p>
                                 <p id="dashFcr" class="text-3xl font-bold text-blue-700">0.000</p>
-                                <p class="text-[10px] text-blue-400 mt-1">Target: < 1.6</p>
+                                <p class="text-[10px] text-blue-400 mt-1">Target: 1.60-1.75</p>
                             </div>
                             <div class="bg-red-50 p-4 rounded-xl border border-red-100 text-center">
                                 <p class="text-xs font-bold text-red-400 uppercase">DEPLESI</p>
@@ -389,7 +404,7 @@
 
     </div>
 
-    <!-- WADAH KHUSUS PRINT (Hidden by default) -->
+    <!-- WADAH KHUSUS PRINT -->
     <div id="print-container"></div>
 
     <script>
@@ -421,21 +436,12 @@
             }
         }
 
-        // --- OPTIMIZED PRINT FUNCTION (NO RESET) ---
         function printContent(elementId) {
             const content = document.getElementById(elementId);
             const printContainer = document.getElementById('print-container');
-            
-            // 1. Bersihkan kontainer print
             printContainer.innerHTML = '';
-            
-            // 2. Clone elemen yang mau di-print
             const clonedContent = content.cloneNode(true);
-            
-            // 3. Masukkan ke kontainer print
             printContainer.appendChild(clonedContent);
-            
-            // 4. Print
             window.print();
         }
 
@@ -443,11 +449,13 @@
             const nama = document.getElementById('namaPegawai').value || "-";
             const doc = document.getElementById('jenisDoc').value || "-";
             const pakan = document.getElementById('jenisPakan').value || "-";
-
-            // Slip Updates
             document.getElementById('slipNama').innerText = nama;
+            
+            // Update Slip Data
+            document.getElementById('slipDoc').innerText = doc;
+            document.getElementById('slipPakan').innerText = pakan;
 
-            // Dash Updates (Hanya Teknis)
+            // Update Dash Data
             document.getElementById('dashDoc').innerText = doc;
             document.getElementById('dashPakan').innerText = pakan;
         }
@@ -472,91 +480,125 @@
                 ip = (( (100-deplesi) * abw ) / ( fcr * umur )) * 100;
             }
 
-            // --- OPTIMIZED SALARY LOGIC V15 (50:50 Split) ---
-            // Upah Basis: Rp 900 (Safety Net)
-            const upahBasis = hidup * 900;
+            // --- SALARY LOGIC V18 (Linear FCR) ---
+            const upahBasis = hidup * 1000;
             
-            let rate = 0;
+            // 1. Tentukan Rate Awal berdasarkan IP
+            let baseRate = 0;
             let grade = "E";
             let color = "slate";
-            let headerColorClass = "bg-slate-800"; // Default dark
+            let headerColorClass = "bg-slate-800";
             let badgeClass = "bg-slate-100 text-slate-500";
 
-            // LOGIKA WARNA & GRADE (Updated Rates for 7k=12M Target)
             if (ip > 400) { 
-                rate = 700; grade = "ISTIMEWA"; color = "emerald"; 
+                baseRate = 700; grade = "ISTIMEWA"; color = "emerald"; 
                 headerColorClass = "bg-emerald-600";
                 badgeClass = "bg-emerald-100 text-emerald-700";
             }
             else if (ip > 360) { 
-                rate = 600; grade = "SGT BAIK"; color = "teal"; 
+                baseRate = 600; grade = "SGT BAIK"; color = "teal"; 
                 headerColorClass = "bg-teal-600";
                 badgeClass = "bg-teal-100 text-teal-700";
             }
             else if (ip >= 330) { 
-                // Target Sweet Spot: IP 330-360 -> Rp 500/kg
-                rate = 500; grade = "BAIK"; color = "blue"; 
+                baseRate = 500; grade = "BAIK"; color = "blue"; 
                 headerColorClass = "bg-blue-600";
                 badgeClass = "bg-blue-100 text-blue-700";
             }
             else if (ip >= 300) { 
-                rate = 400; grade = "STANDAR"; color = "yellow"; 
+                baseRate = 400; grade = "STANDAR"; color = "yellow"; 
                 headerColorClass = "bg-yellow-600";
                 badgeClass = "bg-yellow-100 text-yellow-700";
             }
             else { 
-                rate = 200; grade = "KURANG"; color = "red"; 
+                baseRate = 200; grade = "KURANG"; color = "red"; 
                 headerColorClass = "bg-red-700";
                 badgeClass = "bg-red-100 text-red-700";
             }
 
-            const bonus = Math.floor(totalKg * rate);
+            // 2. Hitung FCR Adjustment
+            let fcrAdj = 0;
+            let fcrPoints = 0;
+            
+            if (fcr < 1.60) {
+                fcrPoints = Math.round((1.60 - fcr) * 100);
+                fcrAdj = fcrPoints * 4;
+            } else if (fcr > 1.75) {
+                fcrPoints = Math.round((1.75 - fcr) * 100); // negative
+                fcrAdj = fcrPoints * 4; 
+            } else {
+                fcrAdj = 0;
+            }
+
+            // Rate Final
+            let finalRate = baseRate + fcrAdj;
+            if (finalRate < 0) finalRate = 0;
+
+            const bonus = Math.floor(totalKg * finalRate);
             const totalGaji = (upahBasis > 0 ? upahBasis : 0) + bonus;
 
-            // --- Generate Conclusion Logic (POSITIVE REINFORCEMENT ADDED) ---
+            // --- Conclusions ---
             let conclusions = [];
             
-            // Analisa IP (Positive Added)
             if (ip >= 330) {
-                conclusions.push("🏆 <span class='font-bold text-green-600'>Hasil Panen Sangat Memuaskan!</span> Manajemen pemeliharaan sangat luar biasa. Terima kasih atas dedikasi tinggi dalam menjaga performa.");
+                conclusions.push("🏆 <span class='font-bold text-green-600'>Hasil Panen Memuaskan!</span> Manajemen sangat baik.");
             } else if (ip >= 300) {
-                conclusions.push("⚠️ <span class='font-bold text-yellow-600'>Hasil Panen Standar.</span> Performa sudah baik namun masih ada peluang keuntungan yang hilang. Tingkatkan kontrol harian untuk periode depan.");
+                conclusions.push("⚠️ <span class='font-bold text-yellow-600'>Hasil Panen Standar.</span> Masih bisa ditingkatkan.");
             } else {
-                conclusions.push("❌ <span class='font-bold text-red-600'>Hasil Panen Kurang Maksimal.</span> Terjadi kebocoran efisiensi yang parah. Wajib evaluasi total manajemen kandang.");
+                conclusions.push("❌ <span class='font-bold text-red-600'>Hasil Panen Rendah.</span> Wajib evaluasi.");
             }
 
-            // Analisa FCR (Positive Added)
-            if (fcr < 1.5 && fcr > 0) {
-                conclusions.push("🌟 <span class='font-bold text-blue-600'>Efisiensi Pakan Luar Biasa ("+fcr.toFixed(3)+").</span> Pemberian pakan sangat teliti dan tidak ada yang terbuang. Pertahankan teknik pemberian pakan ini!");
-            } else if (fcr > 1.6) {
-                conclusions.push("⚠️ <span class='font-bold text-red-600'>FCR Membengkak ("+fcr.toFixed(3)+").</span> Terindikasi banyak <b>pakan tumpah</b> saat pemberian atau tempat pakan terlalu penuh. Segera perbaiki teknis pemberian pakan.");
+            if (fcrAdj < 0) {
+                conclusions.push(`⚠️ <span class='font-bold text-red-600'>Sanksi FCR (${fcr.toFixed(3)}).</span> Boros pakan. Penalti Rp${Math.abs(fcrAdj)}/kg.`);
+            } else if (fcrAdj > 0) {
+                conclusions.push(`🌟 <span class='font-bold text-blue-600'>Bonus Efisiensi Pakan (${fcr.toFixed(3)}).</span> Hemat pakan. Bonus +Rp${fcrAdj}/kg.`);
+            } else {
+                conclusions.push(`ℹ️ <span class='font-bold text-slate-600'>FCR Standar (${fcr.toFixed(3)}).</span> Dalam toleransi.`);
             }
 
-            // Analisa Deplesi (Positive Added)
-            if (deplesi < 3) {
-                conclusions.push("❤️ <span class='font-bold text-green-600'>Tingkat Kehidupan Tinggi (Mati hanya "+deplesi.toFixed(1)+"%).</span> Biosecurity dan penanganan kesehatan berjalan sangat sukses.");
-            } else if (deplesi > 5) {
-                conclusions.push("⚠️ <span class='font-bold text-red-600'>Angka Kematian Tinggi ("+deplesi.toFixed(1)+"%).</span> Perhatian khusus pada masa <b>Brooding</b> (minggu awal). Cek suhu pemanas dan kepadatan kandang.");
+            if (deplesi > 5) {
+                conclusions.push("⚠️ <span class='font-bold text-red-600'>Kematian Tinggi ("+deplesi.toFixed(1)+"%).</span> Cek masa brooding.");
+            } else if (deplesi < 3) {
+                conclusions.push("❤️ <span class='font-bold text-green-600'>Ayam Sehat (Mati "+deplesi.toFixed(1)+"%).</span> Biosecurity bagus.");
             }
 
-            let finalConclusion = conclusions.length > 0 ? conclusions.join("<br><br>") : "Data belum cukup untuk memberikan kesimpulan.";
+            let finalConclusion = conclusions.length > 0 ? conclusions.join("<br><br>") : "-";
 
             // --- POPULATE SLIP ---
             document.getElementById('slipPopulasi').innerText = formatNum(hidup);
             document.getElementById('slipNominalBasis').innerText = formatRupiah(upahBasis);
             
-            // Update Header Color
             document.getElementById('slipHeaderBox').className = `${headerColorClass} p-8 text-white relative overflow-hidden transition-colors duration-500`;
             document.getElementById('slipHeaderGrade').innerText = grade;
 
-            document.getElementById('slipRate').innerText = rate;
-            document.getElementById('slipVol').innerText = formatNum(totalKg);
+            let sign = fcrAdj >= 0 ? '+' : '';
+            let detailBonusText = `Vol: ${formatNum(totalKg)} kg x (Rate IP: ${baseRate} ${fcrAdj !== 0 ? sign + fcrAdj + ' FCR' : ''})`;
+            document.getElementById('slipBonusDetail').innerText = detailBonusText;
+            
             document.getElementById('slipNominalBonus').innerText = formatRupiah(bonus);
             document.getElementById('slipTotal').innerText = formatRupiah(totalGaji);
 
             document.getElementById('slipIp').innerText = Math.round(ip);
             document.getElementById('slipFcr').innerText = fcr.toFixed(3);
             document.getElementById('slipDeplesi').innerText = deplesi.toFixed(2) + "%";
+            
+            // --- UPDATE SLIP FOOTER CARDS (Colorful) ---
+            const slipCardIp = document.getElementById('slipCardIp');
+            const slipCardFcr = document.getElementById('slipCardFcr');
+            const slipCardDeplesi = document.getElementById('slipCardDeplesi');
+
+            // IP Color Logic for Card
+            let ipColor = ip >= 330 ? 'bg-emerald-50 border-emerald-300 text-emerald-800' : (ip >= 300 ? 'bg-yellow-50 border-yellow-300 text-yellow-800' : 'bg-red-50 border-red-300 text-red-800');
+            slipCardIp.className = `p-3 rounded-lg text-center border-l-4 transition-colors ${ipColor}`;
+
+            // FCR Color Logic for Card
+            let fcrColor = fcr < 1.6 ? 'bg-emerald-50 border-emerald-300 text-emerald-800' : (fcr <= 1.75 ? 'bg-blue-50 border-blue-300 text-blue-800' : 'bg-red-50 border-red-300 text-red-800');
+            slipCardFcr.className = `p-3 rounded-lg text-center border-l-4 transition-colors ${fcrColor}`;
+
+            // Deplesi Color Logic for Card
+            let depColor = deplesi < 3 ? 'bg-emerald-50 border-emerald-300 text-emerald-800' : (deplesi <= 5 ? 'bg-blue-50 border-blue-300 text-blue-800' : 'bg-red-50 border-red-300 text-red-800');
+            slipCardDeplesi.className = `p-3 rounded-lg text-center border-l-4 transition-colors ${depColor}`;
+
             
             document.getElementById('slipConclusion').innerHTML = finalConclusion;
 
@@ -569,11 +611,9 @@
             
             document.getElementById('dashIp').innerText = Math.round(ip);
             document.getElementById('dashGradeBadge').innerText = grade;
-
             document.getElementById('dashFcr').innerText = fcr.toFixed(3);
             document.getElementById('dashDeplesi').innerText = deplesi.toFixed(2) + "%";
             document.getElementById('dashAbw').innerText = abw.toFixed(2);
-            
             document.getElementById('dashConclusion').innerHTML = finalConclusion;
 
             document.getElementById('tblPopAwal').innerText = formatNum(populasi);
@@ -584,7 +624,6 @@
 
         function resetForm() {
             document.querySelectorAll('input').forEach(i => i.value = '');
-            // Reset visuals...
             document.getElementById('slipTotal').innerText = "Rp 0";
             document.getElementById('dashIp').innerText = "0";
             updateUI();
